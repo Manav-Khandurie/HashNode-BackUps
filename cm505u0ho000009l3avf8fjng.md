@@ -6,6 +6,8 @@ slug: deploying-microservices-application-on-kubernetes-via-helm
 
 ---
 
+## Introduction
+
 If you’ve worked with full-stack web applications or cloud-native systems, chances are you’ve heard of **Docker & Kubernetes**. But have you ever paused to consider what these two technologies really are and how they complement each other? Docker and Kubernetes are like the dynamic duo of the tech world—think *Bonnie and Clyde*, but for containers and orchestration.
 
 When working with Docker containers or microservices, Kubernetes often becomes part of the equation, along with tools like *Argo CD and Helm* to streamline deployments and manage workloads.
@@ -29,7 +31,7 @@ The first step in deploying your Kubernetes cluster is to determine the type of 
 
 There are numerous Kubernetes solutions available, each with different features and pricing. Choosing the right one depends on the nature of your application and your budget. It’s crucial to strike a balance between cost-effectiveness and alignment with your goals. Here is list of popular Kubernetes distributions [link](https://www.atatus.com/blog/popular-kubernetes-distributions/)
 
-For this demonstration, we’ll go with a **self-hosted, self-managed Kubernetes solution** using **KOps** on AWS EC2 instances. If you’re unfamiliar, **KOps** (short for Kubernetes Operations) is a tool that simplifies the creation of a complete end-to-end Kubernetes cluster. It works seamlessly with AWS and other cloud providers, making it an excellent option for those looking to gain hands-on experience with cloud-based Kubernetes setups. [kops](https://kops.sigs.k8s.io/)  
+For this demonstration, we’ll go with a **self-hosted, self-managed Kubernetes solution** using **KOps** on AWS EC2 instances. If you’re unfamiliar, **KOps** (short for Kubernetes Operations) is a tool that simplifies the creation of a complete end-to-end Kubernetes cluster. It works seamlessly with AWS and other cloud providers, making it an excellent option for those looking to gain hands-on experience with cloud-based Kubernetes setups. [kops](https://kops.sigs.k8s.io/)
 
 [![AWS K8s Kops architecture diagram](https://leverage.binbash.co/assets/images/diagrams/aws-k8s-kops.png align="center")](https://leverage.binbash.co/user-guide/ref-architecture-aws/features/compute/k8s-kops/)
 
@@ -64,3 +66,50 @@ Our application features **four microservices**:
     
 
 We leverage **Kubernetes** to orchestrate these services seamlessly. Some of the essential Kubernetes components we use include *ClusterIP, Deployments, Secrets, Config-Maps, Stateful-Sets, Ingress etc.*
+
+---
+
+## S-3) Understanding the Application Workflow
+
+The workflow of our application is designed to ensure smooth communication, efficient data processing, and resource optimization. Here’s how it works:
+
+### 1\. **User Request and Domain Routing**
+
+When a user interacts with the application, they first access a **domain**. This domain is routed via a DNS service (e.g., GoDaddy) to the **Ingress Controller** in our Kubernetes cluster.
+
+* **API Traffic**: Routed directly to the **backend service**.
+    
+* **Other Traffic**: Routed to the **frontend service**, which serves a **Next.js application**.
+    
+
+### 2\. **Frontend Functionality**
+
+The frontend, built with **Next.js**, collects user data and handles client-side interactions. This data is then sent to the backend service. Communication between the frontend and backend is managed through the **Ingress Backend Controller** deployed within the Kubernetes cluster.
+
+### 3\. **Backend Processing**
+
+The backend service processes the requests received from the frontend. Here's what happens next:
+
+* **Querying the ML Service**:  
+    The backend queries the **ML microservice** using its **Cluster IP**, enabling internal communication within the cluster.
+    
+* **Caching Results**:  
+    The response from the ML service is stored in a **Redis cluster**. This allows the application to quickly serve duplicate requests without reprocessing, saving valuable resources.
+    
+
+### 4\. **Handling Failures Gracefully**
+
+The microservices are designed to be resilient. If any service, such as Redis or the ML service, goes down:
+
+* The backend continues to function, generating appropriate responses or errors.
+    
+* Fallback mechanisms ensure the user experience remains consistent.
+    
+
+### 5\. **Efficient Resource Utilization**
+
+By caching results in Redis, we reduce repetitive computations, ensuring faster responses for duplicate requests and lowering overall resource usage.
+
+I think that's enough technical jargon for now 😅. Let's dive into the hands-on part.
+
+---
