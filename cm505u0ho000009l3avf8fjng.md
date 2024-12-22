@@ -35,6 +35,33 @@ For this demonstration, we’ll go with a **self-hosted, self-managed Kubernetes
 
 [![AWS K8s Kops architecture diagram](https://leverage.binbash.co/assets/images/diagrams/aws-k8s-kops.png align="center")](https://leverage.binbash.co/user-guide/ref-architecture-aws/features/compute/k8s-kops/)
 
+With this setup complete, I’ll assume a DNS address is already assigned to the cluster and ready for use. Now, use the commands below to spin up a multi-node cluster directly.  
+
+<div data-node-type="callout">
+<div data-node-type="callout-emoji">🛑</div>
+<div data-node-type="callout-text"><strong>REPLACE </strong>&lt;DNS-NAME&gt; and &lt;BUCKET-NAME&gt; with your DNS Address and your S3 Bucket.</div>
+</div>
+
+***To Spin up a cluster :***
+
+```bash
+kops create cluster --name <DNS-Name> --state=<BUCKET-NAME> --zones=us-east-1a,us-east-1b --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kube.proddeploy.xyz --node-volume-size=8 --master-volume-size=8
+
+kops update cluster --name <DNS-Name> --state=<BUCKET-NAME> --yes --admin
+```
+
+***To Validate a cluster \[Wait 10-15 min\] :***
+
+```bash
+kops validate cluster --state=<BUCKET-NAME>
+```
+
+***To Delete a cluster:***
+
+```bash
+kops delete cluster --name <DNS-Name> --state=<BUCKET-NAME> --yes  
+```
+
 ---
 
 ## S-2) Understanding the Architecture
@@ -91,7 +118,7 @@ The frontend, built with **Next.js**, collects user data and handles client-side
 The backend service processes the requests received from the frontend. Here's what happens next:
 
 * **Querying the ML Service**:  
-    The backend queries the **ML microservice** using its **Cluster IP**, enabling internal communication within the cluster.
+    The backend queries the **ML microservice** using its **Cluster IP**, enabling internal communication within the cluster. ML-Service computes the result and returns appropriate result.
     
 * **Caching Results**:  
     The response from the ML service is stored in a **Redis cluster**. This allows the application to quickly serve duplicate requests without reprocessing, saving valuable resources.
@@ -113,3 +140,5 @@ By caching results in Redis, we reduce repetitive computations, ensuring faster 
 I think that's enough technical jargon for now 😅. Let's dive into the hands-on part.
 
 ---
+
+## S-4) Setting up Ingress-Nginx Controller
