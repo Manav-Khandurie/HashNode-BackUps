@@ -32,3 +32,7 @@ There are numerous Kubernetes solutions available, each with different features 
 For this demonstration, we’ll go with a **self-hosted, self-managed Kubernetes solution** using **KOps** on AWS EC2 instances. If you’re unfamiliar, **KOps** (short for Kubernetes Operations) is a tool that simplifies the creation of a complete end-to-end Kubernetes cluster. It works seamlessly with AWS and other cloud providers, making it an excellent option for those looking to gain hands-on experience with cloud-based Kubernetes setups. [kops](https://kops.sigs.k8s.io/)
 
 [![AWS K8s Kops architecture diagram](https://leverage.binbash.co/assets/images/diagrams/aws-k8s-kops.png align="center")](https://leverage.binbash.co/user-guide/ref-architecture-aws/features/compute/k8s-kops/)
+
+---
+
+## S-2) Cloning the Source repo
